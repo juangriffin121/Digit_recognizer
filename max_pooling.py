@@ -23,8 +23,17 @@ def max_pooling_func(Input,tamano_ventana):
   return np.array(output),position_matrix
 
 class Max_Pooling(Capa):
-  def __init__(self,tamano_ventana):
+  def __init__(self, tamano_ventana = 2):
     self.tamano_ventana = tamano_ventana
+    
+  def initialize(self):
+    if hasattr(self, 'input_shape'):
+      image_size = self.input_shape[1]
+      output_size = int(image_size/self.tamano_ventana)
+      self.forma_output = (self.input_shape[0],output_size,output_size)
+    else:
+      raise ValueError("Input shape not set. Call set_input_shape before initializing.")
+  
   def forward(self,Input):
     self.input = Input
     output = []
@@ -35,6 +44,7 @@ class Max_Pooling(Capa):
       position_matrix_set.append(position_matrix)
     self.position_matrix_set = position_matrix_set
     return np.array(output)
+  
   def backward(self,grad_output,dt):
     grad_input = np.zeros(self.input.shape)
     for n in range(grad_output.shape[0]):
@@ -43,20 +53,6 @@ class Max_Pooling(Capa):
           position = self.position_matrix_set[n][i][j]
           grad_input[n][position[0]][position[1]] += grad_output[n][i][j]
     return grad_input
-
-M = Max_Pooling(2)
-
-from grapher import graph_tensor
-from used_functions import get_3_image_from_rgb
-from PIL import Image
-
-image = Image.open('smiley.bmp')
-image = np.asarray(image)
-image = get_3_image_from_rgb(image)
-inp = image
-graph_tensor(inp)
-out = M.forward(inp)
-graph_tensor(out)
-output_grad = np.ones(out.shape)
-input_grad = M.backward(output_grad, 1)
-graph_tensor(input_grad)
+  
+  def output_shape(self):
+    return self.forma_output
