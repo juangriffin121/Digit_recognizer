@@ -18,7 +18,11 @@ from io import BytesIO
 nest_asyncio.apply()
 
 red = load_red('red.pickle')
-TOKEN: Final = "6483422003:AAGvDstO5-PB5CeGnnJOC_UdVkuiWAIT-iQ"
+
+with open("WkikiToken") as f:
+    token = f.read()
+
+TOKEN: Final = token
 BOT_USERNAME: Final = "@WkikiBot"
 
 #Commands

@@ -5,11 +5,11 @@ def max_pooling_func(Input,tamano_ventana):
   i=0
   output = []
   position_matrix = []
-  while i<len(Input):
+  while i <= len(Input) - tamano_ventana:
     j=0
     vector = []
     position_vector = []
-    while j<len(Input[0]):
+    while j <= len(Input[0]) - tamano_ventana:
       pool = Input[i:i+tamano_ventana,j:j+tamano_ventana]
       val = np.max(pool)
       position = np.unravel_index(np.argmax(pool, axis=None), pool.shape)
@@ -22,6 +22,7 @@ def max_pooling_func(Input,tamano_ventana):
     i += tamano_ventana
   return np.array(output),position_matrix
 
+
 class Max_Pooling(Capa):
   def __init__(self, tamano_ventana = 2):
     self.tamano_ventana = tamano_ventana
@@ -29,7 +30,7 @@ class Max_Pooling(Capa):
   def initialize(self):
     if hasattr(self, 'input_shape'):
       image_size = self.input_shape[1]
-      output_size = int(image_size/self.tamano_ventana)
+      output_size = image_size//self.tamano_ventana
       self.forma_output = (self.input_shape[0],output_size,output_size)
     else:
       raise ValueError("Input shape not set. Call set_input_shape before initializing.")

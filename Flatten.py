@@ -15,7 +15,7 @@ class Flatten(Capa):
     return Input.reshape(self.forma_output)
   
   def backward(self,grad_output,dt):
-    return grad_output.reshape(self.forma_input)
+    return grad_output.reshape(self.input_shape)
   
   def output_shape(self):
     return self.forma_output

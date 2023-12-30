@@ -30,19 +30,19 @@ def dev_tanh(x):
   return 1 - np.tanh(x) ** 2
 
 class Sigmoid(Activacion):
-  def __init__(self,forma_input):
-    Activacion.__init__(self,sigmoid,dev_sigmoid,forma_input)
+  def __init__(self):
+    Activacion.__init__(self,sigmoid,dev_sigmoid)
 
 class Relu(Activacion):
-  def __init__(self,forma_input):
+  def __init__(self):
     Activacion.__init__(self,relu,dev_relu)
     
 class Leacky_Relu(Activacion):
-  def __init__(self,forma_input):
+  def __init__(self):
     Activacion.__init__(self,leacky_relu,dev_leacky_relu)
     
 class Tanh(Activacion):
-  def __init__(self,forma_input):
+  def __init__(self):
     Activacion.__init__(self,tanh, dev_tanh)
 
 #Hereda de capa y no de activacion porque una neurona depende de todas las anteriores no de una sola
@@ -57,9 +57,13 @@ class Softmax(Capa):
     else:
       raise ValueError("Input shape not set. Call set_input_shape before initializing.")
   
-  def forward(self,Input):
+  @classmethod
+  def softmax(cls, Input):
     vector = np.exp(Input - np.max(Input))
-    self.output = vector/(np.sum(vector))
+    return vector/(np.sum(vector))
+  
+  def forward(self,Input):
+    self.output = self.softmax(Input)
     return self.output
   
   def backward(self, grad_output, dt):
