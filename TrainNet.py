@@ -9,9 +9,9 @@ from Flatten import Flatten
 import preprocess
 import train
 
-red = train.load_red("red3.pickle")
+num = int(input("cuantos datos por digito"))
 
-mnist_train = preprocess.preprocess_data(100)
+mnist_train = preprocess.preprocess_data(num)
 my_train = preprocess.preprocess_my_data()
 
 print("done with data")
@@ -24,5 +24,3 @@ path = input("nombre de la red")
 iteraciones = int(input("cuantas iteraciones?"))
 
 train.EntrenarYGuardar(path, Train, iteraciones, dt=0.0005)
-
-print(red)

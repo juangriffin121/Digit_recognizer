@@ -10,6 +10,7 @@ import preprocess
 import train
 
 input_shape = (1, 28, 28)
+
 red = NeuralNetwork(
     input_shape,
     [
@@ -19,18 +20,16 @@ red = NeuralNetwork(
         ConvolucionalNoBias(3, 5),
         Leacky_Relu(),
         Max_Pooling(),
-        ConvolucionalNoBias(3, 10),
-        Leacky_Relu(),
-        Max_Pooling(),
         Flatten(),
+        Densa(10),
     ],
 )
 
 red.initialize()
-path = "red6.pickle"
+path = "red5.pickle"
 train.save_red(path, red)
 
-mnist_train = preprocess.preprocess_data(100)
+mnist_train = preprocess.preprocess_data(200)
 my_train = preprocess.preprocess_my_data()
 
 print("done with data")

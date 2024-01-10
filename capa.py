@@ -1,19 +1,20 @@
 class Capa:
     def forward(self, input_data):
-        raise NotImplementedError(
-            "forward method must be implemented in each layer")
+        raise NotImplementedError("forward method must be implemented in each layer")
 
     def backward(self, grad_output, dt):
-        raise NotImplementedError(
-            "backward method must be implemented in each layer")
-        
+        raise NotImplementedError("backward method must be implemented in each layer")
+
     def initialize(self):
-        raise NotImplementedError(
-            "initialize method must be implemented in each layer")
+        raise NotImplementedError("initialize method must be implemented in each layer")
 
     def set_input_shape(self, input_shape):
         self.input_shape = input_shape
 
     def output_shape(self):
         raise NotImplementedError(
-            "output_shape method must be implemented in each layer")
+            "output_shape method must be implemented in each layer"
+        )
+
+    def __str__(self):
+        return f"{self.__class__.__name__}\n\t{self.input_shape}->{self.output_shape()}"

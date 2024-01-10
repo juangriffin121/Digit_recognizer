@@ -51,6 +51,5 @@ class NeuralNetwork:
     def __str__(self):
         txt = ""
         for layer in self.layers:
-            layer_name = str(layer).split(".")[1].split(" ")[0]
-            txt += f"{layer_name}\n\t{layer.input_shape} -> {layer.output_shape()}\n"
+            txt += f"{str(layer)}\n"
         return txt
