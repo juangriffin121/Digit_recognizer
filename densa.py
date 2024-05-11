@@ -5,6 +5,7 @@ from scipy import signal
 
 class Densa(Capa):
     def __init__(self, output_size, weight_var=0.1, bias_var=0.1):
+        super().__init__()
         self.output_size = output_size
         self.forma_output = (self.output_size, 1)
         self.weight_var = weight_var
@@ -25,11 +26,12 @@ class Densa(Capa):
         return self.pesos @ self.input + self.sesgos
 
     def backward(self, grad_output, dt):
-        grad_pesos = grad_output @ self.input.T
-        grad_sesgos = grad_output
+        if not self.frozen:
+            grad_pesos = grad_output @ self.input.T
+            grad_sesgos = grad_output
+            self.pesos -= grad_pesos * dt
+            self.sesgos -= grad_sesgos * dt
         grad_input = self.pesos.T @ grad_output
-        self.pesos -= grad_pesos * dt
-        self.sesgos -= grad_sesgos * dt
         return grad_input
 
     def output_shape(self):

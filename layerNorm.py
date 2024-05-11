@@ -1,40 +1,45 @@
 from capa import Capa
 import numpy as np
 
+
 class LayerNorm(Capa):
-  def __init__(self):
-    self.gamma = np.random.randn
-    self.beta = np.random.randn
-    
-  def initialize(self):
-    if hasattr(self, 'input_shape'):
-      self.forma_output = self.input_shape
-    else:
-      raise ValueError("Input shape not set. Call set_input_shape before initializing.")
-    
-  def forward(self,Input):
-    mean = np.mean(Input)
-    std = np.std(Input)
-    norm = (Input - mean)/std
-    output = self.gamma*norm + self.beta
+    def __init__(self):
+        super().__init__()
+        self.gamma = np.random.randn()
+        self.beta = np.random.randn()
 
-    self.input = Input
-    self.norm = norm
+    def initialize(self):
+        if hasattr(self, "input_shape"):
+            self.forma_output = self.input_shape
+        else:
+            raise ValueError(
+                "Input shape not set. Call set_input_shape before initializing."
+            )
 
-    return output
-  
-  def backward(self,grad_output,dt):
-    Input = self.Input
-    norm = self.norm
-    N = Input.size
+    def forward(self, Input):
+        mean = np.mean(Input)
+        std = np.std(Input)
+        norm = (Input - mean) / std
+        output = self.gamma * norm + self.beta
 
-    grad_gamma = grad_output.T@norm
-    grad_beta = np.sum(grad_output)
-    grad_input = self.gamma*(np.identity(N) - 1/N(norm@norm.T + 1))@grad_output
+        self.input = Input
+        self.norm = norm
 
-    self.gamma -= grad_gamma*dt
-    self.beta -= grad_beta*dt
-    return grad_input
-  
-  def output_shape(self):
-    return self.forma_output
+        return output
+
+    def backward(self, grad_output, dt):
+        Input = self.input
+        norm = self.norm
+        N = Input.size
+        if not self.frozen:
+            grad_gamma = grad_output.T @ norm
+            grad_beta = np.sum(grad_output)
+            self.gamma -= grad_gamma * dt
+            self.beta -= grad_beta * dt
+        grad_input = (
+            self.gamma * (np.identity(N) - 1 / N * (norm @ norm.T + 1)) @ grad_output
+        )
+        return grad_input
+
+    def output_shape(self):
+        return self.forma_output

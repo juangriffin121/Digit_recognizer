@@ -1,4 +1,7 @@
 class Capa:
+    def __init__(self):
+        self.frozen = False
+
     def forward(self, input_data):
         raise NotImplementedError("forward method must be implemented in each layer")
 
@@ -18,3 +21,13 @@ class Capa:
 
     def __str__(self):
         return f"{self.__class__.__name__}\n\t{self.input_shape}->{self.output_shape()}"
+
+    def __call__(self, *prev_layers):
+        self.prev_layers = prev_layers
+        return self
+
+    def freeze(self):
+        self.frozen = True
+
+    def unfreeze(self):
+        self.frozen = False

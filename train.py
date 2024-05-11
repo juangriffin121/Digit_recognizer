@@ -4,18 +4,8 @@ from costos import (
     softmax_cross_entropy,
     dev_softmax_cross_entropy,
 )
-from activaciones import Sigmoid, Leacky_Relu, Softmax
-from convolucional import Convolucional
-from densa import Densa
-from max_pooling import Max_Pooling
-from grapher import graph_tensor
-from reshape import Reshape
-from Flatten import Flatten
 import numpy as np
 import pickle
-
-costo = softmax_cross_entropy
-dev_costo = dev_softmax_cross_entropy
 
 
 def respuesta(red, Input):
@@ -23,8 +13,9 @@ def respuesta(red, Input):
     return output
 
 
-def iteracion(red, datos, dt):
-    # error = 0
+def iteracion(red, datos, loss, dt):
+    error = 0
+    costo, dev_costo = loss
     correctos = 0
     i = 0
     for dato in datos:
@@ -34,8 +25,10 @@ def iteracion(red, datos, dt):
         Input = dato["input"]
         output_correcto = dato["output"]
         output = respuesta(red, Input)
-        # error += costo(output, output_correcto)
-        if np.argmax(output) == np.argmax(output_correcto):
+        error += costo(output, output_correcto)
+        if np.argmax(output[1]) == np.argmax(
+            output_correcto[1]
+        ):  # poner el [1] solo si es autoencoder_pred
             correctos += 1
         # print("out")
         # print(output)
@@ -43,14 +36,20 @@ def iteracion(red, datos, dt):
         # print("grad")
         # print(grad_error)
         red.backward(grad_error, dt)
-    error = 1
+    # error = 1
     return error / len(datos), correctos
 
 
-def entrenar(red, datos, num_iteraciones, dt=0.2):
+def entrenar(
+    red,
+    datos,
+    num_iteraciones,
+    loss,
+    dt=0.2,
+):
     for i in range(num_iteraciones):
-        error, correctos = iteracion(red, datos, dt)
-        print(i, correctos, f"{int(correctos/len(datos)*100)}%")  # error
+        error, correctos = iteracion(red, datos, loss, dt)
+        print(i, error, correctos, f"{int(correctos/len(datos)*100)}%")  # error
 
 
 def save_red(filepath, red):
@@ -65,9 +64,15 @@ def load_red(filepath):
     return red
 
 
-def EntrenarYGuardar(filepath, datos, num_iteraciones, dt=0.2):
+def EntrenarYGuardar(
+    filepath,
+    datos,
+    num_iteraciones,
+    loss=(softmax_cross_entropy, dev_softmax_cross_entropy),
+    dt=0.2,
+):
     red = load_red(filepath)
-    entrenar(red, datos, num_iteraciones, dt)
+    entrenar(red, datos, num_iteraciones, loss, dt)
     save_red(filepath, red)
 
 

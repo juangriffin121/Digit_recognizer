@@ -8,6 +8,7 @@ from reshape import Reshape
 from Flatten import Flatten
 import preprocess
 import train
+from costos import ecm, dev_ecm
 
 num = int(input("cuantos datos por digito"))
 
@@ -22,5 +23,11 @@ Train = train.mix(mnist_train, my_train)
 path = input("nombre de la red")
 
 iteraciones = int(input("cuantas iteraciones?"))
+
+# net = train.load_red(path)
+
+# loss = ecm, dev_ecm
+
+# net.train(Train, loss, iteraciones, 0.0005)
 
 train.EntrenarYGuardar(path, Train, iteraciones, dt=0.0005)

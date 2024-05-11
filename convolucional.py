@@ -5,6 +5,7 @@ from scipy import signal
 
 class Convolucional(Capa):
     def __init__(self, tamano_filtro, num_filtros):
+        super().__init__()
         self.tamano_filtro = tamano_filtro
         self.num_filtros = num_filtros
 
@@ -44,17 +45,20 @@ class Convolucional(Capa):
         return output
 
     def backward(self, grad_output, dt):
-        self.grad_sesgos = grad_output
-        self.grad_filtros = np.zeros(self.forma_filtro)
+        if not self.frozen:
+            self.grad_sesgos = grad_output
+            self.grad_filtros = np.zeros(self.forma_filtro)
         grad_input = np.zeros(self.forma_input)
         for n, filtro3d in enumerate(self.filtros):
             for m, filtro in enumerate(filtro3d):
-                self.grad_filtros[n][m] = signal.correlate2d(
-                    self.input[m], grad_output[n], mode="valid"
-                )
+                if not self.frozen:
+                    self.grad_filtros[n][m] = signal.correlate2d(
+                        self.input[m], grad_output[n], mode="valid"
+                    )
                 grad_input[m] += signal.convolve2d(grad_output[n], filtro, "full")
-        self.sesgos -= dt * self.grad_sesgos
-        self.filtros -= dt * self.grad_filtros
+        if not self.frozen:
+            self.sesgos -= dt * self.grad_sesgos
+            self.filtros -= dt * self.grad_filtros
         return grad_input
 
     def output_shape(self):
@@ -62,10 +66,12 @@ class Convolucional(Capa):
 
 
 class ConvolucionalNoBias(Capa):
-    def __init__(self, tamano_filtro, num_filtros, weight_var = 0.1):
+    def __init__(self, tamano_filtro, num_filtros, weight_var=0.1):
+        super().__init__()
         self.tamano_filtro = tamano_filtro
         self.num_filtros = num_filtros
         self.weight_var = weight_var
+
     def initialize(self):
         if hasattr(self, "input_shape"):
             profundidad_in, altura_in, ancho_in = self.input_shape
@@ -82,8 +88,7 @@ class ConvolucionalNoBias(Capa):
                 altura_in - self.tamano_filtro + 1,
                 ancho_in - self.tamano_filtro + 1,
             )
-            self.filtros = self.weight_var*np.random.randn(*self.forma_filtro)
-            # self.sesgos = np.random.randn(*self.forma_output)
+            self.filtros = self.weight_var * np.random.randn(*self.forma_filtro)
 
         else:
             raise ValueError(
@@ -97,21 +102,22 @@ class ConvolucionalNoBias(Capa):
             for m, filtro in enumerate(filtro3d):
                 output[n] += signal.correlate2d(
                     self.input[m], filtro, mode="valid"
-                )  # + self.sesgos[n]
+                )
         return output
 
     def backward(self, grad_output, dt):
-        # self.grad_sesgos = grad_output
-        self.grad_filtros = np.zeros(self.forma_filtro)
+        if not self.frozen:
+            self.grad_filtros = np.zeros(self.forma_filtro)
         grad_input = np.zeros(self.forma_input)
         for n, filtro3d in enumerate(self.filtros):
             for m, filtro in enumerate(filtro3d):
-                self.grad_filtros[n][m] = signal.correlate2d(
-                    self.input[m], grad_output[n], mode="valid"
-                )
+                if not self.frozen:
+                    self.grad_filtros[n][m] = signal.correlate2d(
+                        self.input[m], grad_output[n], mode="valid"
+                    )
                 grad_input[m] += signal.convolve2d(grad_output[n], filtro, "full")
-        # self.sesgos -= dt*self.grad_sesgos
-        self.filtros -= dt * self.grad_filtros
+        if not self.frozen:
+            self.filtros -= dt * self.grad_filtros
         return grad_input
 
     def output_shape(self):
