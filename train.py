@@ -26,8 +26,10 @@ def iteracion(red, datos, loss, dt):
         output_correcto = dato["output"]
         output = respuesta(red, Input)
         error += costo(output, output_correcto)
-        if np.argmax(output[1]) == np.argmax(
-            output_correcto[1]
+        if np.argmax(output) == np.argmax(
+            # if np.argmax(output[1]) == np.argmax(
+            output_correcto
+            # output_correcto[1]
         ):  # poner el [1] solo si es autoencoder_pred
             correctos += 1
         # print("out")

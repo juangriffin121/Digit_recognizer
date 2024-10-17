@@ -22,8 +22,8 @@ class NeuralNetwork:
         for layer in self.layers:
             output = layer.forward(output)
             max = np.max(output)
-            # if np.isnan(max):
-            #    raise ValueError(f"something is nan in layer {str(layer)}")
+            if np.isnan(max):
+                raise ValueError(f"something is nan in layer {str(layer)}")
         return output
 
     def backward(self, grad_output, dt):
