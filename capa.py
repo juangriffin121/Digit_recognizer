@@ -2,7 +2,7 @@ class Capa:
     def __init__(self):
         self.frozen = False
 
-    def forward(self, input_data):
+    def forward(self, Input):
         raise NotImplementedError("forward method must be implemented in each layer")
 
     def backward(self, grad_output, dt):

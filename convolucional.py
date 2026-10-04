@@ -45,18 +45,18 @@ class Convolucional(Capa):
         return output
 
     def backward(self, grad_output, dt):
-        if not self.frozen:
+        if not hasattr(self, "frozen") or not self.frozen:
             self.grad_sesgos = grad_output
             self.grad_filtros = np.zeros(self.forma_filtro)
         grad_input = np.zeros(self.forma_input)
         for n, filtro3d in enumerate(self.filtros):
             for m, filtro in enumerate(filtro3d):
-                if not self.frozen:
+                if not hasattr(self, "frozen") or not self.frozen:
                     self.grad_filtros[n][m] = signal.correlate2d(
                         self.input[m], grad_output[n], mode="valid"
                     )
                 grad_input[m] += signal.convolve2d(grad_output[n], filtro, "full")
-        if not self.frozen:
+        if not hasattr(self, "frozen") or not self.frozen:
             self.sesgos -= dt * self.grad_sesgos
             self.filtros -= dt * self.grad_filtros
         return grad_input
@@ -100,23 +100,21 @@ class ConvolucionalNoBias(Capa):
         output = np.zeros(self.forma_output)
         for n, filtro3d in enumerate(self.filtros):
             for m, filtro in enumerate(filtro3d):
-                output[n] += signal.correlate2d(
-                    self.input[m], filtro, mode="valid"
-                )
+                output[n] += signal.correlate2d(self.input[m], filtro, mode="valid")
         return output
 
     def backward(self, grad_output, dt):
-        if not self.frozen:
+        if not hasattr(self, "frozen") or not self.frozen:
             self.grad_filtros = np.zeros(self.forma_filtro)
         grad_input = np.zeros(self.forma_input)
         for n, filtro3d in enumerate(self.filtros):
             for m, filtro in enumerate(filtro3d):
-                if not self.frozen:
+                if not hasattr(self, "frozen") or not self.frozen:
                     self.grad_filtros[n][m] = signal.correlate2d(
                         self.input[m], grad_output[n], mode="valid"
                     )
                 grad_input[m] += signal.convolve2d(grad_output[n], filtro, "full")
-        if not self.frozen:
+        if not hasattr(self, "frozen") or not self.frozen:
             self.filtros -= dt * self.grad_filtros
         return grad_input
 

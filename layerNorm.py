@@ -31,7 +31,7 @@ class LayerNorm(Capa):
         Input = self.input
         norm = self.norm
         N = Input.size
-        if not self.frozen:
+        if not hasattr(self, "frozen") or not self.frozen:
             grad_gamma = grad_output.T @ norm
             grad_beta = np.sum(grad_output)
             self.gamma -= grad_gamma * dt
