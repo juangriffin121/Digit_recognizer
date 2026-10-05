@@ -58,7 +58,8 @@ class BranchedNetwork:
             if isinstance(module, list):
                 txt += "[\n"
                 for sub_module in module:
-                    txt += f"\t{str(sub_module).replace("\n","\n\t")}"
+                    txt = str(sub_module).replace('\n','\n\t')
+                    txt += f"\t{txt}"
                     txt += "--------"
                     txt += "\n"
                 txt += "]"

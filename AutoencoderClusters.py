@@ -36,11 +36,20 @@ colors = [
 
 for dato in Train:
     digit = np.argmax(dato["output"])
-    latent_vector = get_mean.forward(encoder.forward(dato["input"])).reshape(
-        2,
+    latent_vector = get_mean.forward(encoder.forward(dato["input"])).reshape(2)
+
+    plt.plot(
+        latent_vector[0],
+        latent_vector[1],
+        ".",
+        color=colors[digit],
+        alpha=0.5,
     )
-    print(latent_vector)
-    print(digit)
-    plt.plot(latent_vector[0], latent_vector[1], ".", color=colors[digit], alpha=0.5)
+
+# Legend
+for digit, color in enumerate(colors[:10]):
+    plt.plot([], [], ".", color=color, label=str(digit))
+
+plt.legend(title="Digit")
 
 plt.savefig("Clusters")

@@ -7,10 +7,15 @@ def get_digit(num):
     return np.eye(10)[num].reshape((10, 1))
 
 
+# Pixels are divided by this so inputs live in [0, 1] instead of [0, 255].
+# NOTE: networks trained on raw 0-255 data (old .pickle files) need PIXEL_SCALE = 1.0
+PIXEL_SCALE = 255.0
+
+
 def process_sample(sample):
-    digit = sample[0]
+    digit = int(sample.iloc[0])
     digit_vector = get_digit(digit)
-    pixels = np.array(sample[1:]).reshape((1, 28, 28))
+    pixels = np.array(sample.iloc[1:], dtype=float).reshape((1, 28, 28)) / PIXEL_SCALE
     return {"input": pixels, "output": digit_vector}
 
 
@@ -22,7 +27,7 @@ def preprocess_generic_data(file_path, num_datos=None):
     for _, sample in df.iterrows():
         processed_sample = process_sample(sample)
 
-        digit_class = f"digit_class: {sample[0]}"
+        digit_class = f"digit_class: {int(sample.iloc[0])}"
         if digit_class not in Datos:
             Datos[digit_class] = []
         Datos[digit_class].append(processed_sample)

@@ -1,22 +1,19 @@
+import os
+
 import matplotlib.pyplot as plt
-from densa import DensaNoBias
+import numpy as np
+
 import train
-from densa import Densa
+from densa import Densa, DensaNoBias
 from Flatten import Flatten
-from grapher import graph_tensor
 
 # Only to be called on Network with only fully conected layer ((784,1)->(10,1))
 path = input("nombre de la red")
 red = train.load_red(path)
 print(red)
 
-# densa = red[1]
-# for i, peso in enumerate(densa.pesos):
-#    plt.imshow(peso.reshape((28, 28)))
-#    plt.savefig(f"./pesos/peso{i}")
 
-
-def GraphBoundaryDense(red, BoundaryPosition):
+def GraphBoundaryDense(red, BoundaryPosition, filepath="./pesos/pesos"):
     dense = red[BoundaryPosition]
     flatten = red[BoundaryPosition - 1]
 
@@ -27,14 +24,24 @@ def GraphBoundaryDense(red, BoundaryPosition):
         raise ValueError("the layer at boundary isnt a Dense layer")
 
     pesos = dense.pesos
-    for i, peso in enumerate(pesos):
-        print(peso)
-        # im = peso.reshape((28, 28))
-        # graph_tensor(im, f"./pesos/peso{i}")
+    n = len(pesos)
 
-        print(i)
-        plt.imshow(peso.reshape((28, 28)))
-        plt.savefig(f"./pesos/peso{i}")
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
+    # One row of the weight matrix per subplot, all stacked in a single column
+    fig, axes = plt.subplots(nrows=n, ncols=1, figsize=(3, 3 * n))
+    for i, (peso, ax) in enumerate(zip(pesos, axes)):
+        # Diverging colormap centred on 0: red = positive weight, blue = negative.
+        # Symmetric limits per image so 0 is always the neutral (white) colour.
+        lim = np.max(np.abs(peso))
+        ax.imshow(peso.reshape((28, 28)), cmap="RdBu_r", vmin=-lim, vmax=lim)
+        ax.set_title(f"digit {i}", fontsize=10)
+        ax.axis("off")
+
+    fig.tight_layout()
+    fig.savefig(filepath)
+    plt.close(fig)
+    print(f"guardado en {filepath}.png")
 
 
 pos = int(input("posicion de la densa limite"))
